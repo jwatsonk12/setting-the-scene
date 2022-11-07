@@ -19,6 +19,11 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
         . . . f f f . . . . . . . . . . 
         `)
 })
+function ClearLevel () {
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        value.destroy()
+    }
+}
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     timer.debounce("action", 150, function () {
         if (Direction == "DOWN") {
@@ -190,6 +195,36 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
         ........................
         `)
 })
+function CreateLevel () {
+    if (Level == 1) {
+        tiles.setTilemap(tilemap`level1`)
+    } else if (Level == 2) {
+        tiles.setCurrentTilemap(tilemap`level3`)
+    } else {
+    	
+    }
+    tiles.placeOnRandomTile(Link, assets.tile`myTile1`)
+    for (let index = 0; index < 4; index++) {
+        Evil_Kitty = sprites.create(img`
+            e e e . . . . e e e . . . . 
+            c d d c . . c d d c . . . . 
+            c b d d f f d d b c . . . . 
+            c 3 b d d b d b 3 c . . . . 
+            f b 3 d d d d 3 b f . . . . 
+            e d d d d d d d d e . . . . 
+            e d 2 d d d d 2 d e . b f b 
+            f d d 2 d d 2 d d f . f d f 
+            f b d d f f d d 2 f . f d f 
+            . f 2 2 2 2 2 2 b b f f d f 
+            . f b d d d d d d b b d b f 
+            . f d d d d d b d d f f f . 
+            . f d f f f d f f d f . . . 
+            . f f . . f f . . f f . . . 
+            `, SpriteKind.Enemy)
+        Evil_Kitty.follow(Link, 40)
+        tiles.placeOnRandomTile(Evil_Kitty, sprites.builtin.brick)
+    }
+}
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     Direction = "DOWN"
     Link.setImage(img`
@@ -219,11 +254,15 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         ........................
         `)
 })
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile2`, function (sprite, location) {
+    ClearLevel()
+})
+let Evil_Kitty: Sprite = null
 let projectile: Sprite = null
 let Direction = ""
-let Evil_Kitty: Sprite = null
 let Link: Sprite = null
-tiles.setTilemap(tilemap`level1`)
+let Level = 0
+Level = 1
 Link = sprites.create(img`
     ........................
     ......ffff..............
@@ -251,25 +290,5 @@ Link = sprites.create(img`
     ........................
     `, SpriteKind.Player)
 controller.moveSprite(Link)
-tiles.placeOnRandomTile(Link, assets.tile`myTile1`)
 scene.cameraFollowSprite(Link)
-for (let index = 0; index < 4; index++) {
-    Evil_Kitty = sprites.create(img`
-        e e e . . . . e e e . . . . 
-        c d d c . . c d d c . . . . 
-        c b d d f f d d b c . . . . 
-        c 3 b d d b d b 3 c . . . . 
-        f b 3 d d d d 3 b f . . . . 
-        e d d d d d d d d e . . . . 
-        e d 2 d d d d 2 d e . b f b 
-        f d d 2 d d 2 d d f . f d f 
-        f b d d f f d d 2 f . f d f 
-        . f 2 2 2 2 2 2 b b f f d f 
-        . f b d d d d d d b b d b f 
-        . f d d d d d b d d f f f . 
-        . f d f f f d f f d f . . . 
-        . f f . . f f . . f f . . . 
-        `, SpriteKind.Enemy)
-    Evil_Kitty.follow(Link, 40)
-    tiles.placeOnRandomTile(Evil_Kitty, sprites.builtin.brick)
-}
+CreateLevel()
